@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pocket_fm/models/all_orders.dart';
 import 'package:pocket_fm/models/order_history.dart';
 import 'package:pocket_fm/services/order_history_services.dart';
 
@@ -12,14 +13,13 @@ class OrderHistoryBloc extends Bloc<OrderHistoryEvent, OrderHistoryState> {
     on<UpdateOrderHistory>(_onUpdateOrderHistory);
   }
 
-  Future<void> _onGetOrderHistory(
+  void _onGetOrderHistory(
     GetOrderHistory event,
     Emitter<OrderHistoryState> emit,
   ) async {
     emit(OrderHistoryLoading());
     try {
-      final AllOrders? allOrders = await OrderHistoryService()
-          .getAllOrderHistory();
+      final AllOrders? allOrders = OrderHistoryService().getAllOrderHistory();
       emit(OrderHistoryLoaded(allOrders ?? AllOrders(orders: [])));
     } catch (e) {
       emit(OrderHistoryError('Failed to fetch order history $e'));
@@ -33,7 +33,7 @@ class OrderHistoryBloc extends Bloc<OrderHistoryEvent, OrderHistoryState> {
     emit(OrderHistoryLoading());
     try {
       await OrderHistoryService().saveOrderHistory(event.orderedItem);
-      final allOrders = await OrderHistoryService().getAllOrderHistory();
+      final allOrders = OrderHistoryService().getAllOrderHistory();
       emit(OrderHistoryLoaded(allOrders ?? AllOrders(orders: [])));
     } catch (e) {
       emit(OrderHistoryError('Failed to refresh order history $e'));

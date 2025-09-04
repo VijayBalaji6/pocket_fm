@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalDBServices {
@@ -12,10 +14,22 @@ class LocalDBServices {
     prefs = await SharedPreferences.getInstance();
   }
 
-  String? getData(String key) {
+  String? getDataString(String key) {
     try {
       String? value = prefs.getString(key);
       return value;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Map<String, dynamic>? getDataMap(String key) {
+    try {
+      String? value = prefs.getString(key);
+      if (value != null) {
+        return json.decode(value);
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -42,6 +56,17 @@ class LocalDBServices {
   Future<void> writeData({required String key, required String value}) async {
     try {
       await prefs.setString(key, value);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> writeDataMap({
+    required String key,
+    required Map<String, dynamic> value,
+  }) async {
+    try {
+      await prefs.setString(key, json.encode(value));
     } catch (e) {
       rethrow;
     }

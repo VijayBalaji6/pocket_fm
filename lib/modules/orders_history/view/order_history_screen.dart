@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pocket_fm/models/cart.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:pocket_fm/app_router.dart';
 import 'package:pocket_fm/models/order_history.dart';
 import 'package:pocket_fm/modules/orders_history/bloc/order_history_bloc.dart';
 
@@ -20,14 +22,58 @@ class OrderHistoryScreen extends StatelessWidget {
             if (orders.isEmpty) {
               return const Center(child: Text('No orders found.'));
             }
-            return ListView.builder(
-              itemCount: orders.length,
-              itemBuilder: (context, index) {
-                final OrderHistory currentOrder = orders[index];
 
-                return ListTile(
-                  title: Text('Order #${currentOrder.orderId}'),
-                  subtitle: Text('Total: \$${currentOrder.totalAmount}'),
+            return ListView.builder(
+              padding: EdgeInsets.all(10),
+              itemCount: orders.length,
+              itemBuilder: (BuildContext context, int index) {
+                final OrderHistory currentOrder = orders[index];
+                final String totalAmount = currentOrder.totalAmount
+                    .toStringAsFixed(2);
+                final String orderDate = DateFormat(
+                  'yyyy-MM-dd hh:mm a',
+                ).format(currentOrder.orderDate);
+                return GestureDetector(
+                  onTap: () {
+                    context.pushNamed(
+                      AppRoutes.orderDetailsScreen.name,
+                      extra: currentOrder,
+                    );
+                  },
+                  child: Card(
+                    elevation: 4,
+                    child: ListTile(
+                      trailing: Icon(Icons.arrow_forward_ios_rounded),
+                      title: Text('Order #${currentOrder.orderId},'),
+                      titleTextStyle: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      subtitle: Column(
+                        spacing: 10,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(),
+                          Text(
+                            'Total: \$$totalAmount',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Date: $orderDate',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
               },
             );
@@ -38,54 +84,6 @@ class OrderHistoryScreen extends StatelessWidget {
             child: Text('Order history details will be shown here.'),
           );
         },
-      ),
-    );
-  }
-}
-
-class OrderHistoryDetails extends StatelessWidget {
-  const OrderHistoryDetails({super.key, required this.orderDetails});
-  final OrderHistory orderDetails;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Card(
-        elevation: 4,
-        child: ListTile(
-          title: Text('Order #${orderDetails.orderId}'),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 8),
-              Text('Total Amount: \$${orderDetails.totalAmount}'),
-              const SizedBox(height: 4),
-              Text('Date: ${orderDetails.orderDate}'),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: orderDetails.products.cartItems.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final CartProduct cartItem =
-                      orderDetails.products.cartItems[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(cartItem.products.name),
-                        Text('Qty: ${cartItem.count}'),
-                        Text('\$${cartItem.products.price * cartItem.count}'),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

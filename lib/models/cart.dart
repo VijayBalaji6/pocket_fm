@@ -1,11 +1,7 @@
 import 'dart:convert';
 
-import 'package:json_annotation/json_annotation.dart';
 import 'package:pocket_fm/models/product.dart';
 
-part 'cart.g.dart';
-
-@JsonSerializable()
 class CartProduct {
   final String productId;
   final int count;
@@ -25,18 +21,28 @@ class CartProduct {
     );
   }
 
-  factory CartProduct.fromMap(Map<String, dynamic> json) =>
-      _$CartProductFromJson(json);
+  factory CartProduct.fromMap(Map<String, dynamic> map) {
+    return CartProduct(
+      productId: map['productId'] as String,
+      count: map['count'] as int,
+      products: Product.fromJson(map['products'] as Map<String, dynamic>),
+    );
+  }
 
-  Map<String, dynamic> toMap() => _$CartProductToJson(this);
+  Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'count': count,
+      'products': products.toJson(),
+    };
+  }
 
   String toJson() => json.encode(toMap());
 
   factory CartProduct.fromJson(String source) =>
-      _$CartProductFromJson(json.decode(source));
+      CartProduct.fromMap(json.decode(source));
 }
 
-@JsonSerializable()
 class Cart {
   final List<CartProduct> cartItems;
 
@@ -46,11 +52,27 @@ class Cart {
     return Cart(cartItems: cartProduct != null ? [cartProduct] : cartItems);
   }
 
-  factory Cart.fromMap(Map<String, dynamic> map) => _$CartFromJson(map);
+  factory Cart.fromMap(Map<String, dynamic> map) {
+    return Cart(
+      cartItems: map['cartItems'] != null
+          ? List<CartProduct>.from(
+              (map['cartItems'] as List).map(
+                (item) => CartProduct.fromMap(
+                  item is Map<String, dynamic>
+                      ? item
+                      : Map<String, dynamic>.from(item),
+                ),
+              ),
+            )
+          : [],
+    );
+  }
 
-  Map<String, dynamic> toMap() => _$CartToJson(this);
+  Map<String, dynamic> toMap() {
+    return {'cartItems': cartItems.map((item) => item.toMap()).toList()};
+  }
 
-  String toJson() => json.encode(toJson());
+  String toJson() => json.encode(toMap());
 
-  factory Cart.fromJson(String source) => _$CartFromJson(json.decode(source));
+  factory Cart.fromJson(String source) => Cart.fromMap(json.decode(source));
 }

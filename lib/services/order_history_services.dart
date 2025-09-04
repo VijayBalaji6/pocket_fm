@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
+import 'package:pocket_fm/models/all_orders.dart';
 import 'package:pocket_fm/models/order_history.dart';
 import 'package:pocket_fm/services/core/local_db_services.dart';
 
@@ -9,9 +12,11 @@ class OrderHistoryService {
 
   final String _orderHistoryKey = 'order_history';
 
-  Future<AllOrders?> getAllOrderHistory() async {
+  AllOrders? getAllOrderHistory() {
     try {
-      String? value = await LocalDBServices.instance.getData(_orderHistoryKey);
+      Map<String, dynamic>? value = LocalDBServices.instance.getDataMap(
+        _orderHistoryKey,
+      );
       if (value != null) {
         return AllOrders.fromJson(value);
       } else {
@@ -24,11 +29,10 @@ class OrderHistoryService {
 
   Future<void> saveOrderHistory(OrderHistory orderHistory) async {
     try {
-      AllOrders allOrders = await getAllOrderHistory() ?? AllOrders(orders: []);
-
+      AllOrders allOrders = getAllOrderHistory() ?? AllOrders(orders: []);
       allOrders.orders.add(orderHistory);
-
-      await LocalDBServices.instance.writeData(
+      // allOrders.toJson() already returns a JSON string
+      await LocalDBServices.instance.writeDataMap(
         key: _orderHistoryKey,
         value: allOrders.toJson(),
       );

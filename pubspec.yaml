@@ -10,16 +10,17 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.5.3
-  json_annotation: ^4.9.0
+  # json_annotation: ^4.9.0
   flutter_bloc: ^9.1.1
   go_router: ^16.2.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   build_runner: ^2.6.0
-  json_serializable: ^6.10.0
+  # json_serializable: ^6.10.0
 
 flutter:
   uses-material-design: true

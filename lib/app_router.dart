@@ -1,9 +1,16 @@
 import 'package:go_router/go_router.dart';
+import 'package:pocket_fm/models/order_history.dart';
 import 'package:pocket_fm/modules/cart/view/cart_screen.dart';
 import 'package:pocket_fm/modules/home/view/home_screen.dart';
+import 'package:pocket_fm/modules/orders_history/view/order_history_details_screen.dart';
 import 'package:pocket_fm/modules/orders_history/view/order_history_screen.dart';
 
-enum AppRoutes { homeScreen, cartScreen, orderHistoryScreen }
+enum AppRoutes {
+  homeScreen,
+  cartScreen,
+  orderHistoryScreen,
+  orderDetailsScreen,
+}
 
 class AppRouter {
   static final GoRouter appRoutes = GoRouter(
@@ -23,6 +30,14 @@ class AppRouter {
         name: AppRoutes.orderHistoryScreen.name,
         path: '/orderHistory',
         builder: (context, state) => const OrderHistoryScreen(),
+      ),
+      GoRoute(
+        name: AppRoutes.orderDetailsScreen.name,
+        path: '/orderDetails',
+        builder: (context, state) {
+          final OrderHistory orderDetails = state.extra as OrderHistory;
+          return OrderHistoryDetails(orderDetails: orderDetails);
+        },
       ),
     ],
   );

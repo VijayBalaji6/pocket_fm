@@ -79,7 +79,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onCheckoutCart(CheckoutCart event, Emitter<CartState> emit) {
     if (state is CartLoaded) {
-      emit(CartInitial());
+      emit(CartLoaded(Cart(cartItems: [])));
     }
   }
 }

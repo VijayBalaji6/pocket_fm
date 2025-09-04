@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pocket_fm/models/cart.dart';
 import 'package:pocket_fm/models/product.dart';
 import 'package:pocket_fm/modules/cart/bloc/cart_bloc.dart';
 import 'package:pocket_fm/modules/home/bloc/home_bloc.dart';
 import 'package:pocket_fm/modules/orders_history/bloc/order_history_bloc.dart';
-import 'package:pocket_fm/router.dart';
+import 'package:pocket_fm/app_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -21,10 +22,11 @@ class HomeScreen extends StatelessWidget {
               context.read<OrderHistoryBloc>().add(GetOrderHistory());
               await context.pushNamed(AppRoutes.orderHistoryScreen.name);
             },
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.calendar_today_sharp),
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: BlocBuilder<CartBloc, CartState>(
         builder: (BuildContext context, CartState state) {
           int cartItems = 0;
@@ -39,7 +41,7 @@ class HomeScreen extends StatelessWidget {
               spacing: 10,
               children: [
                 Icon(Icons.shopping_cart),
-                if (state is CartLoaded) Text('($cartItems)'),
+                if (state is CartLoaded && cartItems > 0) Text('($cartItems)'),
               ],
             ),
           );
@@ -53,63 +55,106 @@ class HomeScreen extends StatelessWidget {
             final List<Product> products = state.products;
             return BlocBuilder<CartBloc, CartState>(
               builder: (BuildContext context, CartState state) {
-                return ListView.separated(
-                  itemCount: products.length,
-                  separatorBuilder: (context, index) => const Divider(),
-                  itemBuilder: (BuildContext context, int index) {
-                    final Product currentItem = products[index];
-                    return ListTile(
-                      title: Text(currentItem.name),
-                      subtitle: Column(
-                        spacing: 20,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(currentItem.description),
-                          Row(
-                            spacing: 8,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('\$ ${currentItem.price}'),
-                              ((state as CartLoaded).cart.cartItems.any(
-                                    (item) => item.productId == currentItem.id,
-                                  ))
-                                  ? Row(
-                                      spacing: 10,
-                                      children: [
-                                        ElevatedButton(
-                                          child: const Icon(Icons.add),
-                                          onPressed: () {
-                                            context.read<CartBloc>().add(
-                                              AddProductToCart(currentItem),
-                                            );
-                                          },
-                                        ),
-                                        ElevatedButton(
-                                          child: const Icon(Icons.remove),
-                                          onPressed: () {
-                                            context.read<CartBloc>().add(
-                                              RemoveProductFromCart(
-                                                currentItem.id,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    )
-                                  : ElevatedButton(
-                                      child: Text("Add to cart"),
-                                      onPressed: () {
-                                        context.read<CartBloc>().add(
-                                          AddProductToCart(currentItem),
-                                        );
-                                      },
-                                    ),
-                            ],
-                          ),
-                        ],
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Products",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  },
+                    ),
+                    Expanded(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: products.length,
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemBuilder: (BuildContext context, int index) {
+                          final Product currentItem = products[index];
+                          return ListTile(
+                            title: Text(currentItem.name),
+                            subtitle: Column(
+                              spacing: 20,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(currentItem.description),
+                                Row(
+                                  spacing: 8,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('\$ ${currentItem.price}'),
+                                    ((state as CartLoaded).cart.cartItems.any(
+                                          (item) =>
+                                              item.productId == currentItem.id,
+                                        ))
+                                        ? Builder(
+                                            builder: (context) {
+                                              final CartProduct cartItem =
+                                                  (state).cart.cartItems
+                                                      .firstWhere(
+                                                        (item) =>
+                                                            item.productId ==
+                                                            currentItem.id,
+                                                      );
+                                              return Row(
+                                                spacing: 10,
+                                                children: [
+                                                  Text(
+                                                    "Count: ${cartItem.count}",
+                                                  ),
+                                                  ElevatedButton(
+                                                    child: const Icon(
+                                                      Icons.remove,
+                                                    ),
+                                                    onPressed: () {
+                                                      context
+                                                          .read<CartBloc>()
+                                                          .add(
+                                                            RemoveProductFromCart(
+                                                              currentItem.id,
+                                                            ),
+                                                          );
+                                                    },
+                                                  ),
+                                                  ElevatedButton(
+                                                    child: const Icon(
+                                                      Icons.add,
+                                                    ),
+                                                    onPressed: () {
+                                                      context
+                                                          .read<CartBloc>()
+                                                          .add(
+                                                            AddProductToCart(
+                                                              currentItem,
+                                                            ),
+                                                          );
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          )
+                                        : ElevatedButton(
+                                            child: Text("Add to cart"),
+                                            onPressed: () {
+                                              context.read<CartBloc>().add(
+                                                AddProductToCart(currentItem),
+                                              );
+                                            },
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               },
             );

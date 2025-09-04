@@ -15,6 +15,8 @@ class CartScreen extends StatelessWidget {
         final List<CartProduct> cartItems =
             (state as CartLoaded).cart.cartItems;
 
+        bool isCartEmpty = cartItems.isEmpty;
+
         double totalAmount = cartItems.fold(
           0,
           (previousValue, element) =>
@@ -22,41 +24,47 @@ class CartScreen extends StatelessWidget {
         );
         return Scaffold(
           appBar: AppBar(title: const Text('Cart')),
-          bottomNavigationBar: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              spacing: 30,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FloatingActionButton.extended(
-                  onPressed: () {
-                    context.read<CartBloc>().add(ClearCart());
-                  },
-                  label: const Text('Clear Cart'),
-                  icon: const Icon(Icons.clear),
-                ),
-                FloatingActionButton.extended(
-                  onPressed: () {
-                    DateTime orderId = DateTime.now();
-                    context.read<OrderHistoryBloc>().add(
-                      UpdateOrderHistory(
-                        OrderHistory(
-                          orderId: orderId.toString(),
-                          products: Cart(cartItems: cartItems),
-                          totalAmount: totalAmount,
-                          orderDate: orderId,
-                          orderedTime: orderId,
-                        ),
+          bottomNavigationBar: isCartEmpty
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    spacing: 30,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      FloatingActionButton.extended(
+                        heroTag: 'clearCartBtn',
+                        onPressed: () {
+                          context.read<CartBloc>().add(ClearCart());
+                        },
+                        label: const Text('Clear Cart'),
+                        icon: const Icon(Icons.clear),
                       ),
-                    );
-                  },
-                  label: const Text('Checkout Cart'),
-                  icon: const Icon(Icons.shopping_bag),
+                      FloatingActionButton.extended(
+                        heroTag: 'checkoutCartBtn',
+                        onPressed: () {
+                          DateTime orderTime = DateTime.now();
+                          String orderId = orderTime.millisecondsSinceEpoch
+                              .toString();
+                          context.read<OrderHistoryBloc>().add(
+                            UpdateOrderHistory(
+                              OrderHistory(
+                                orderId: orderId,
+                                products: Cart(cartItems: cartItems),
+                                totalAmount: totalAmount,
+                                orderDate: orderTime,
+                              ),
+                            ),
+                          );
+                          context.read<CartBloc>().add(CheckoutCart());
+                        },
+                        label: const Text('Checkout Cart'),
+                        icon: const Icon(Icons.shopping_bag),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-          body: (cartItems.isEmpty)
+          body: (isCartEmpty)
               ? const Center(child: Text('Your cart is empty'))
               : ListView.builder(
                   shrinkWrap: true,

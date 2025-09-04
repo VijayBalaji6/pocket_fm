@@ -1,8 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'product.g.dart';
-
-@JsonSerializable()
 class Product {
   final String id;
   final String name;
@@ -20,8 +15,25 @@ class Product {
     required this.inStock,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) =>
-      _$ProductFromJson(json);
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      price: (json['price'] as num).toDouble(),
+      imageUrl: json['imageUrl'] as String,
+      inStock: json['inStock'] as bool,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$ProductToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+      'inStock': inStock,
+    };
+  }
 }
