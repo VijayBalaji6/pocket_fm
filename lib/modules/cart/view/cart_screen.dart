@@ -66,74 +66,89 @@ class CartScreen extends StatelessWidget {
                 ),
           body: (isCartEmpty)
               ? const Center(child: Text('Your cart is empty'))
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: cartItems.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final CartProduct item = cartItems[index];
-                    final double totalPrice = double.parse(
-                      (item.products.price * item.count).toStringAsFixed(2),
-                    );
-                    final double itemPrice = double.parse(
-                      (item.products.price).toStringAsFixed(2),
-                    );
-                    return Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+              : Column(
+                  children: [
+                    Text(
+                      'Total Amount: \$ ${totalAmount.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        border: Border.all(color: Colors.grey, width: 1),
-                        borderRadius: BorderRadius.circular(8),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: cartItems.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final CartProduct item = cartItems[index];
+                          final double totalPrice = double.parse(
+                            (item.products.price * item.count).toStringAsFixed(
+                              2,
+                            ),
+                          );
+                          final double itemPrice = double.parse(
+                            (item.products.price).toStringAsFixed(2),
+                          );
+                          return Container(
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              border: Border.all(color: Colors.grey, width: 1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              spacing: 10,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  spacing: 15,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(item.products.name),
+                                    Row(
+                                      spacing: 20,
+                                      children: [
+                                        Text('Quantity: $itemPrice'),
+                                        Text('Quantity: ${item.count}'),
+                                      ],
+                                    ),
+                                    Text('Total item Price: \$ $totalPrice'),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 10,
+                                  children: [
+                                    ElevatedButton(
+                                      child: const Icon(Icons.remove),
+                                      onPressed: () {
+                                        context.read<CartBloc>().add(
+                                          RemoveProductFromCart(item.productId),
+                                        );
+                                      },
+                                    ),
+                                    ElevatedButton(
+                                      child: const Icon(Icons.add),
+                                      onPressed: () {
+                                        context.read<CartBloc>().add(
+                                          AddProductToCart(item.products),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                      child: Row(
-                        spacing: 10,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            spacing: 15,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(item.products.name),
-                              Row(
-                                spacing: 20,
-                                children: [
-                                  Text('Quantity: $itemPrice'),
-                                  Text('Quantity: ${item.count}'),
-                                ],
-                              ),
-                              Text('Total item Price: \$ $totalPrice'),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            spacing: 10,
-                            children: [
-                              ElevatedButton(
-                                child: const Icon(Icons.remove),
-                                onPressed: () {
-                                  context.read<CartBloc>().add(
-                                    RemoveProductFromCart(item.productId),
-                                  );
-                                },
-                              ),
-                              ElevatedButton(
-                                child: const Icon(Icons.add),
-                                onPressed: () {
-                                  context.read<CartBloc>().add(
-                                    AddProductToCart(item.products),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
         );
       },
