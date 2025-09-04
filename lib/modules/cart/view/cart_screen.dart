@@ -22,36 +22,39 @@ class CartScreen extends StatelessWidget {
         );
         return Scaffold(
           appBar: AppBar(title: const Text('Cart')),
-          floatingActionButton: Row(
-            spacing: 30,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              FloatingActionButton.extended(
-                onPressed: () {
-                  context.read<CartBloc>().add(ClearCart());
-                },
-                label: const Text('Clear Cart'),
-                icon: const Icon(Icons.clear),
-              ),
-              FloatingActionButton.extended(
-                onPressed: () {
-                  DateTime orderId = DateTime.now();
-                  context.read<OrderHistoryBloc>().add(
-                    UpdateOrderHistory(
-                      OrderHistory(
-                        orderId: orderId.toString(),
-                        products: Cart(cartItems: cartItems),
-                        totalAmount: totalAmount,
-                        orderDate: orderId,
-                        orderedTime: orderId,
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              spacing: 30,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton.extended(
+                  onPressed: () {
+                    context.read<CartBloc>().add(ClearCart());
+                  },
+                  label: const Text('Clear Cart'),
+                  icon: const Icon(Icons.clear),
+                ),
+                FloatingActionButton.extended(
+                  onPressed: () {
+                    DateTime orderId = DateTime.now();
+                    context.read<OrderHistoryBloc>().add(
+                      UpdateOrderHistory(
+                        OrderHistory(
+                          orderId: orderId.toString(),
+                          products: Cart(cartItems: cartItems),
+                          totalAmount: totalAmount,
+                          orderDate: orderId,
+                          orderedTime: orderId,
+                        ),
                       ),
-                    ),
-                  );
-                },
-                label: const Text('Checkout Cart'),
-                icon: const Icon(Icons.shopping_bag),
-              ),
-            ],
+                    );
+                  },
+                  label: const Text('Checkout Cart'),
+                  icon: const Icon(Icons.shopping_bag),
+                ),
+              ],
+            ),
           ),
           body: (cartItems.isEmpty)
               ? const Center(child: Text('Your cart is empty'))

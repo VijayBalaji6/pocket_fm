@@ -1,25 +1,21 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalDBServices {
-  static final LocalDBServices _instance = LocalDBServices._internal();
-  factory LocalDBServices() => _instance;
+  static final LocalDBServices instance = LocalDBServices._internal();
   LocalDBServices._internal();
 
-  final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
+  factory LocalDBServices() => instance;
 
-  Future<String?> getData(String key) async {
-    try {
-      String? value = await _flutterSecureStorage.read(key: key);
-      return value;
-    } catch (e) {
-      return null;
-    }
+  late SharedPreferences prefs;
+
+  Future<void> init() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
-  Future<Map<String, String>> getAllData() async {
+  String? getData(String key) {
     try {
-      Map<String, String> allValues = await _flutterSecureStorage.readAll();
-      return allValues;
+      String? value = prefs.getString(key);
+      return value;
     } catch (e) {
       rethrow;
     }
@@ -27,7 +23,7 @@ class LocalDBServices {
 
   Future<bool> deleteData(String key) async {
     try {
-      await _flutterSecureStorage.delete(key: key);
+      await prefs.remove(key);
       return true;
     } catch (e) {
       rethrow;
@@ -36,16 +32,16 @@ class LocalDBServices {
 
   Future<bool> deleteAllData() async {
     try {
-      await _flutterSecureStorage.deleteAll();
+      await prefs.clear();
       return true;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> writeData(String key, String value) async {
+  Future<void> writeData({required String key, required String value}) async {
     try {
-      await _flutterSecureStorage.write(key: key, value: value);
+      await prefs.setString(key, value);
     } catch (e) {
       rethrow;
     }

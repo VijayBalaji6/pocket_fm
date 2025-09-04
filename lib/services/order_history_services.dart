@@ -1,4 +1,4 @@
-import 'package:pocket_fm/models/cart.dart';
+import 'package:flutter/widgets.dart';
 import 'package:pocket_fm/models/order_history.dart';
 import 'package:pocket_fm/services/core/local_db_services.dart';
 
@@ -11,7 +11,7 @@ class OrderHistoryService {
 
   Future<AllOrders?> getAllOrderHistory() async {
     try {
-      String? value = await LocalDBServices().getData(_orderHistoryKey);
+      String? value = await LocalDBServices.instance.getData(_orderHistoryKey);
       if (value != null) {
         return AllOrders.fromJson(value);
       } else {
@@ -25,12 +25,15 @@ class OrderHistoryService {
   Future<void> saveOrderHistory(OrderHistory orderHistory) async {
     try {
       AllOrders allOrders = await getAllOrderHistory() ?? AllOrders(orders: []);
-      if (allOrders.orders.isNotEmpty) {
-        allOrders.orders.add(orderHistory);
-      }
 
-      await LocalDBServices().writeData(_orderHistoryKey, allOrders.toJson());
+      allOrders.orders.add(orderHistory);
+
+      await LocalDBServices.instance.writeData(
+        key: _orderHistoryKey,
+        value: allOrders.toJson(),
+      );
     } catch (e) {
+      debugPrint('Error writing data: $e');
       rethrow;
     }
   }

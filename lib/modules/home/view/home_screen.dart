@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pocket_fm/models/product.dart';
 import 'package:pocket_fm/modules/cart/bloc/cart_bloc.dart';
 import 'package:pocket_fm/modules/home/bloc/home_bloc.dart';
+import 'package:pocket_fm/modules/orders_history/bloc/order_history_bloc.dart';
 import 'package:pocket_fm/router.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,7 +13,18 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              context.read<OrderHistoryBloc>().add(GetOrderHistory());
+              await context.pushNamed(AppRoutes.orderHistoryScreen.name);
+            },
+            icon: const Icon(Icons.history),
+          ),
+        ],
+      ),
       floatingActionButton: BlocBuilder<CartBloc, CartState>(
         builder: (BuildContext context, CartState state) {
           int cartItems = 0;
