@@ -100,7 +100,7 @@ class CartScreen extends StatelessWidget {
                               border: Border.all(color: Colors.grey, width: 1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Row(
+                            child: Column(
                               spacing: 10,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,32 +113,33 @@ class CartScreen extends StatelessWidget {
                                     Row(
                                       spacing: 20,
                                       children: [
-                                        Text('Quantity: $itemPrice'),
+                                        Text('Item Cost: $itemPrice'),
                                         Text('Quantity: ${item.count}'),
                                       ],
                                     ),
                                     Text('Total item Price: \$ $totalPrice'),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  spacing: 10,
-                                  children: [
-                                    ElevatedButton(
-                                      child: const Icon(Icons.remove),
-                                      onPressed: () {
-                                        context.read<CartBloc>().add(
-                                          RemoveProductFromCart(item.productId),
-                                        );
-                                      },
-                                    ),
-                                    ElevatedButton(
-                                      child: const Icon(Icons.add),
-                                      onPressed: () {
-                                        context.read<CartBloc>().add(
-                                          AddProductToCart(item.products),
-                                        );
-                                      },
+                                    Row(
+                                      spacing: 30,
+                                      children: [
+                                        ElevatedButton(
+                                          child: const Icon(Icons.remove),
+                                          onPressed: () {
+                                            context.read<CartBloc>().add(
+                                              RemoveProductFromCart(
+                                                item.productId,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        ElevatedButton(
+                                          child: const Icon(Icons.add),
+                                          onPressed: () {
+                                            context.read<CartBloc>().add(
+                                              AddProductToCart(item.products),
+                                            );
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
